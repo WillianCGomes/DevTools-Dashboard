@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Frontend</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Gerador de Frontend</h2>
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <form id="imageForm">
+                    <div class="form-group">
+                        <label for="imageFile">Envie sua imagem:</label>
+                        <input type="file" class="form-control-file" id="imageFile" name="imageFile">
+                        <button type="button" class="btn btn-primary" style="margin-top: 1rem;" onclick="submitImageForm()">Enviar</button>
+                        <img id="loadingImage" src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="Loading..." class="mt-2" style="display: none; width: 3rem;">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h4>Código Gerado:</h4>
+                <div id="generatedCodeMarkdown" style="display: none;" class="card mb-4 custom-card">
+                    <div class="card-body">
+                        <div id="generatedCode" class="form-control w-100" style="height: 40rem; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function submitImageForm() {
+            var formData = new FormData(document.getElementById('imageForm'));
+            var loadingImage = document.getElementById('loadingImage');
+            loadingImage.style.display = 'inline-block';
+
+            $.ajax({
+                url: '/gerar_frontend',  // Ajuste esta URL conforme necessário
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    loadGeneratedCode(response);
+                }
+            });
+        }
+
+        function loadGeneratedCode(response) {
+            var loadingImage = document.getElementById('loadingImage');
+            loadingImage.style.display = 'none';
+            var converter = new showdown.Converter(),
+                html = converter.makeHtml(response);
+            document.getElementById('generatedCode').innerHTML = html;
+            document.getElementById('generatedCodeMarkdown').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

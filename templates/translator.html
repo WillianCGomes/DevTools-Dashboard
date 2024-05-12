@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradutor de Código</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Tradutor de Código</h2>
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <form id="codeTranslatorForm">
+                    <div class="form-group">
+                        <label for="codeFile">Envie seu arquivo de código:</label>
+                        <input type="file" class="form-control-file" id="codeFile" name="codeFile">
+                        <button type="button" class="btn btn-success" style="margin-top: 1rem;" onclick="submitForm()">Enviar</button>
+                        <img id="loadingGif" src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"
+                        alt="Loading..." class="mt-2" style="display: none; width: 3rem;">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div id="traducaoContainer" class="col-md-12" style="display: none;">
+                <h4>Explicação:</h4>
+                <div class="resultadoContainer card mb-4 custom-card" id="resultadoContainer">
+
+                    <div id="retornoTraducao" class="form-group">
+                        <div class="form-group">
+                            <div id="traducaoMarkdown" class="form-control w-100" style="height: 40rem; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function submitForm() {
+            var formData = new FormData(document.getElementById('codeTranslatorForm'));
+
+            var loadingGif = document.getElementById('loadingGif');
+            loadingGif.style.display = 'inline-block';
+
+            $.ajax({
+                url: '/traduz_codigo',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    carregaTraducao(response);
+                }
+            });
+
+        }
+
+        function carregaTraducao(response) {
+            var loadingGif = document.getElementById('loadingGif');
+                loadingGif.style.display = 'none';
+            var converter = new showdown.Converter(),
+                html = converter.makeHtml(response);
+            document.getElementById('traducaoMarkdown').innerHTML = html;
+            document.getElementById('traducaoContainer').style.display = 'block';
+        } 
+    </script>
+
+</body>
+
+</html>
